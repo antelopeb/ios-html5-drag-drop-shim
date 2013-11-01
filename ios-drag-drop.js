@@ -1,6 +1,6 @@
 (function(doc) {
 
-  log = function() {}; // noOp, remove this line to enable debugging
+  //log = function() {}; // noOp, remove this line to enable debugging
 
   main()
 
@@ -58,7 +58,7 @@
       }
     },
     move: function(event) {
-      var deltas = { x: [], y: [] };
+      var deltas = { x: [], y: [] };	  
 
       ;[].forEach.call(event.changedTouches,function(touch, index) {
         var lastPosition = this.touchPositions[index];
@@ -74,7 +74,20 @@
 
       this.elTranslation.x += average(deltas.x);
       this.elTranslation.y += average(deltas.y);
+      this.el.style['position'] = "fixed";
       this.el.style["-webkit-transform"] = "translate(" + this.elTranslation.x + "px," + this.elTranslation.y + "px)";
+
+      var target = elementFromTouchEvent(this.el,event),
+      	  dragoverEvt = doc.createEvent("Event");
+
+      dragoverEvt.dataTransfer = {
+        getData: function(type) {
+          return this.dragData[type];
+        }.bind(this)
+      };
+
+	  dragoverEvt.initEvent("dragover",true,true);
+	  target.dispatchEvent(dragoverEvt);
     },
     dragend: function(event) {
 
@@ -125,6 +138,7 @@
         this.el.style["-webkit-transition"] = "none";
       },this);
       setTimeout(function() {
+	    this.el.style["position"] = "static";
         this.el.style["-webkit-transition"] = "all 0.2s";
         this.el.style["-webkit-transform"] = "translate(0,0)";
       }.bind(this));
